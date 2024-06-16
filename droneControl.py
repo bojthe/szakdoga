@@ -59,10 +59,10 @@ class DroneController:
         self.decodeQrEvent.set()
 
         # reacting to QR interpretation
-        await __findAngle(drone)
-        await __findDistance(drone)
-        await __findVerticalPosition(drone)
-        await __findHorizontalPosition(drone)
+        await self.__findAngle(drone)
+        await self.__findDistance(drone)
+        await self.__findVerticalPosition(drone)
+        await self.__findHorizontalPosition(drone)
 
         if self.failedEvent.is_set():
             print("Repositioning FAILED.")
