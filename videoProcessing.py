@@ -34,10 +34,38 @@ class videoProcessor:
     def process(self):
         try:
             self.capture.open(VIDEO_URL)
+            frameCount = 0
+            points, data = None, None
+            nothingFound = True
             while True:
                 grabbed, frame = self.capture.read()
                 if grabbed:
-                    cv2.imshow("video_input", frame)
+                    if self.decodeQrEvent.is_set():
+                        # every 5 frames try and decode the QR code
+                        if frameCount % 5 == 0:
+                            data, points, _ = self.decoder.detectAndDecode(frame)
+                        frameCount = frameCount + 1
+                        if points is not None and len(points) > 0 and data is not None:
+                            nothingFound = False
+                            # print(data)
+                            code = data.split("-")
+                            if len(code) == 3:
+                                print(code[0] + " " + code[1] + " " + code[2])
+                                self.__interpretQR(frame, points[0], code[0], code[1], code[2])
+
+                        cv2.imshow('tello-asyncio', frame)
+                        if frameCount > 100 and nothingFound == True:
+                            frameCount = 0
+                            print("FAILURE. QR code not found.")
+                            self.angleOkEvent.set()
+                            self.distanceOkEvent.set()
+                            self.verticalOkEvent.set()
+                            self.horizontalOkEvent.set()
+                            self.failedEvent.set()
+                            break
+                    else:
+                        cv2.imshow('video_input', frame)
+                        frameCount = 0
                 if cv2.waitKey(1) != -1:
                     break
         except KeyboardInterrupt:
