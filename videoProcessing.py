@@ -53,7 +53,7 @@ class videoProcessor:
                                 print(code[0] + " " + code[1] + " " + code[2])
                                 self.__interpretQR(frame, points[0], code[0], code[1], code[2])
 
-                        cv2.imshow('tello-asyncio', frame)
+                        cv2.imshow('video_input', frame)
                         if frameCount > 100 and nothingFound == True:
                             frameCount = 0
                             print("FAILURE. QR code not found.")
