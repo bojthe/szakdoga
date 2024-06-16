@@ -22,7 +22,8 @@ if __name__ == '__main__':
     print("[main thread] Creating controller thread")
     controller = droneControl.DroneController(angleOkEvent, distanceOkEvent, verticalOkEvent, horizontalOkEvent,
                                               turnClockwiseEvent, turnCounterClockwiseEvent, moveLeftEvent, moveRightEvent,
-                                              moveUpEvent, moveDownEvent, moveForwardEvent, moveBackwardEvent)
+                                              moveUpEvent, moveDownEvent, moveForwardEvent, moveBackwardEvent,
+                                              decodeQrEvent, failedEvent)
     flyingThread = threading.Thread(target=controller.flyAutomatic, daemon=True)
     flyingThread.start()
 
