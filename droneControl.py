@@ -1,6 +1,6 @@
 import threading
 import asyncio
-
+from tello_asyncio import Tello
 
 class DroneController:
 
@@ -26,20 +26,27 @@ class DroneController:
         print("[drone thread] Drone thread START.")
 
         async def main():
-            while True:
-                if self.angleOkEvent.is_set():
-                    print("[drone thread] Angle event set.")
-                if self.distanceOkEvent.is_set():
-                    print("[drone thread] Distance event set.")
-                if self.verticalOkEvent.is_set():
-                    print("[drone thread] Vertical event set.")
-                if self.horizontalOkEvent.is_set():
-                    print("[drone thread] Horizontal event set.")
-                await asyncio.sleep(0.5)
+            drone = Tello()
+            try:
+                await drone.connect()
+                await drone.start_video(connect=False)
+                await asyncio.sleep(5)  # non-blocking sleep
+                await drone.takeoff()
+
+                # Here goes the automatic drone pathing
+
+                #await __reposition(drone)
+
+                await drone.land()
+            finally:
+                await drone.stop_video()
+                await drone.disconnect()
+
+
 
         asyncio.run(main())
 
-        async def reposition(drone):
+        async def __reposition(drone):
             # clearing all events to have an initial state
             self.angleOkEvent.clear()
             self.distanceOkEvent.clear()
