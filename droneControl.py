@@ -80,7 +80,7 @@ class DroneController:
         async def __findAngle(drone):
             controlSet = False
             while not self.angleOkEvent.is_set():
-                if not controlSet and tself.urnClockwiseEvent.is_set():
+                if not controlSet and self.turnClockwiseEvent.is_set():
                     drone.remote_control(left_right=0, forward_back=0, updown=0, yaw=1)
                     controlSet = True
                 elif not controlSet and self.turnCounterClockwiseEvent.is_set():
@@ -111,7 +111,7 @@ class DroneController:
                 if not controlSet and self.moveUpEvent.is_set():
                     drone.remote_control(left_right=0, forward_back=0, updown=1, yaw=0)
                     controlSet = True
-                elif not controlSet and moveDownEvent.is_set():
+                elif not controlSet and self.moveDownEvent.is_set():
                     drone.remote_control(left_right=0, forward_back=0, updown=-1, yaw=0)
                     controlSet = True
                 elif controlSet:
