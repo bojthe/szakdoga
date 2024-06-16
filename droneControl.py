@@ -35,7 +35,7 @@ class DroneController:
 
                 # Here goes the automatic drone pathing
 
-                #await __reposition(drone)
+                await self.__reposition(drone)
 
                 await drone.land()
             finally:
@@ -45,93 +45,92 @@ class DroneController:
 
 
         asyncio.run(main())
-
-        async def __reposition(drone):
-            # clearing all events to have an initial state
-            self.angleOkEvent.clear()
-            self.distanceOkEvent.clear()
-            self.verticalOkEvent.clear()
-            self.horizontalOkEvent.clear()
-
-            # setting the event for QR decoding
-            print("QR decoding enabled.")
-            self.decodeQrEvent.set()
-
-            # reacting to QR interpretation
-            await __findAngle(drone)
-            await __findDistance(drone)
-            await __findVerticalPosition(drone)
-            await __findHorizontalPosition(drone)
-
-            if self.failedEvent.is_set():
-                print("Repositioning FAILED.")
-                self.failedEvent.clear()
-            else:
-                print("Repositioning DONE.")
-
-            # clearing all impacted events
-            self.decodeQrEvent.clear()
-            print("QR decoding disabled.")
-            self.angleOkEvent.clear()
-            self.distanceOkEvent.clear()
-            self.verticalOkEvent.clear()
-            self.horizontalOkEvent.clear()
-
-        async def __findAngle(drone):
-            controlSet = False
-            while not self.angleOkEvent.is_set():
-                if not controlSet and self.turnClockwiseEvent.is_set():
-                    drone.remote_control(left_right=0, forward_back=0, updown=0, yaw=1)
-                    controlSet = True
-                elif not controlSet and self.turnCounterClockwiseEvent.is_set():
-                    drone.remote_control(left_right=0, forward_back=0, updown=0, yaw=-1)
-                    controlSet = True
-                elif controlSet:
-                    drone.remote_control(left_right=0, forward_back=0, updown=0, yaw=0)
-                    controlSet = False
-            drone.remote_control(left_right=0, forward_back=0, updown=0, yaw=0)
-
-        async def __findDistance(drone):
-            controlSet = False
-            while not self.distanceOkEvent.is_set():
-                if not controlSet and self.moveForwardEvent.is_set():
-                    drone.remote_control(left_right=0, forward_back=1, updown=0, yaw=0)
-                    controlSet = True
-                elif not controlSet and self.moveBackwardEvent.is_set():
-                    drone.remote_control(left_right=0, forward_back=-1, updown=0, yaw=0)
-                    controlSet = True
-                elif controlSet:
-                    drone.remote_control(left_right=0, forward_back=0, updown=0, yaw=0)
-                    controlSet = False
-            drone.remote_control(left_right=0, forward_back=0, updown=0, yaw=0)
-
-        async def __findVerticalPosition(drone):
-            controlSet = False
-            while not self.verticalOkEvent.is_set():
-                if not controlSet and self.moveUpEvent.is_set():
-                    drone.remote_control(left_right=0, forward_back=0, updown=1, yaw=0)
-                    controlSet = True
-                elif not controlSet and self.moveDownEvent.is_set():
-                    drone.remote_control(left_right=0, forward_back=0, updown=-1, yaw=0)
-                    controlSet = True
-                elif controlSet:
-                    drone.remote_control(left_right=0, forward_back=0, updown=0, yaw=0)
-                    controlSet = False
-            drone.remote_control(left_right=0, forward_back=0, updown=0, yaw=0)
-
-        async def __findHorizontalPosition(drone):
-            controlSet = False
-            while not self.horizontalOkEvent.is_set():
-                if not controlSet and self.moveLeftEvent.is_set():
-                    drone.remote_control(left_right=1, forward_back=0, updown=0, yaw=0)
-                    controlSet = True
-                elif not controlSet and self.moveRightEvent.is_set():
-                    drone.remote_control(left_right=-1, forward_back=0, updown=0, yaw=0)
-                    controlSet = True
-                elif controlSet:
-                    drone.remote_control(left_right=0, forward_back=0, updown=0, yaw=0)
-                    controlSet = False
-            drone.remote_control(left_right=0, forward_back=0, updown=0, yaw=0)
-
         print("[drone thread] Drone thread END.")
+
+    async def __reposition(self, drone):
+        # clearing all events to have an initial state
+        self.angleOkEvent.clear()
+        self.distanceOkEvent.clear()
+        self.verticalOkEvent.clear()
+        self.horizontalOkEvent.clear()
+
+        # setting the event for QR decoding
+        print("QR decoding enabled.")
+        self.decodeQrEvent.set()
+
+        # reacting to QR interpretation
+        await __findAngle(drone)
+        await __findDistance(drone)
+        await __findVerticalPosition(drone)
+        await __findHorizontalPosition(drone)
+
+        if self.failedEvent.is_set():
+            print("Repositioning FAILED.")
+            self.failedEvent.clear()
+        else:
+            print("Repositioning DONE.")
+
+        # clearing all impacted events
+        self.decodeQrEvent.clear()
+        print("QR decoding disabled.")
+        self.angleOkEvent.clear()
+        self.distanceOkEvent.clear()
+        self.verticalOkEvent.clear()
+        self.horizontalOkEvent.clear()
+
+    async def __findAngle(self, drone):
+        controlSet = False
+        while not self.angleOkEvent.is_set():
+            if not controlSet and self.turnClockwiseEvent.is_set():
+                drone.remote_control(left_right=0, forward_back=0, updown=0, yaw=1)
+                controlSet = True
+            elif not controlSet and self.turnCounterClockwiseEvent.is_set():
+                drone.remote_control(left_right=0, forward_back=0, updown=0, yaw=-1)
+                controlSet = True
+            elif controlSet:
+                drone.remote_control(left_right=0, forward_back=0, updown=0, yaw=0)
+                controlSet = False
+        drone.remote_control(left_right=0, forward_back=0, updown=0, yaw=0)
+
+    async def __findDistance(self, drone):
+        controlSet = False
+        while not self.distanceOkEvent.is_set():
+            if not controlSet and self.moveForwardEvent.is_set():
+                drone.remote_control(left_right=0, forward_back=1, updown=0, yaw=0)
+                controlSet = True
+            elif not controlSet and self.moveBackwardEvent.is_set():
+                drone.remote_control(left_right=0, forward_back=-1, updown=0, yaw=0)
+                controlSet = True
+            elif controlSet:
+                drone.remote_control(left_right=0, forward_back=0, updown=0, yaw=0)
+                controlSet = False
+        drone.remote_control(left_right=0, forward_back=0, updown=0, yaw=0)
+
+    async def __findVerticalPosition(self, drone):
+        controlSet = False
+        while not self.verticalOkEvent.is_set():
+            if not controlSet and self.moveUpEvent.is_set():
+                drone.remote_control(left_right=0, forward_back=0, updown=1, yaw=0)
+                controlSet = True
+            elif not controlSet and self.moveDownEvent.is_set():
+                drone.remote_control(left_right=0, forward_back=0, updown=-1, yaw=0)
+                controlSet = True
+            elif controlSet:
+                drone.remote_control(left_right=0, forward_back=0, updown=0, yaw=0)
+                controlSet = False
+        drone.remote_control(left_right=0, forward_back=0, updown=0, yaw=0)
+
+    async def __findHorizontalPosition(self, drone):
+        controlSet = False
+        while not self.horizontalOkEvent.is_set():
+            if not controlSet and self.moveLeftEvent.is_set():
+                drone.remote_control(left_right=1, forward_back=0, updown=0, yaw=0)
+                controlSet = True
+            elif not controlSet and self.moveRightEvent.is_set():
+                drone.remote_control(left_right=-1, forward_back=0, updown=0, yaw=0)
+                controlSet = True
+            elif controlSet:
+                drone.remote_control(left_right=0, forward_back=0, updown=0, yaw=0)
+                controlSet = False
+        drone.remote_control(left_right=0, forward_back=0, updown=0, yaw=0)
 
