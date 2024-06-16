@@ -39,6 +39,37 @@ class DroneController:
 
         asyncio.run(main())
 
+        async def __reposition(drone):
+            # clearing all events to have an initial state
+            self.angleOkEvent.clear()
+            self.distanceOkEvent.clear()
+            self.verticalOkEvent.clear()
+            self.horizontalOkEvent.clear()
+
+            # setting the event for QR decoding
+            print("QR decoding enabled.")
+            self.decodeQrEvent.set()
+
+            # reacting to QR interpretation
+            await __findAngle(drone)
+            await __findDistance(drone)
+            await __findVerticalPosition(drone)
+            await __findHorizontalPosition(drone)
+
+            if self.failedEvent.is_set():
+                print("Repositioning FAILED.")
+                self.failedEvent.clear()
+            else:
+                print("Repositioning DONE.")
+
+            # clearing all impacted events
+            self.decodeQrEvent.clear()
+            print("QR decoding disabled.")
+            self.angleOkEvent.clear()
+            self.distanceOkEvent.clear()
+            self.verticalOkEvent.clear()
+            self.horizontalOkEvent.clear()
+
         async def __findAngle(drone):
             controlSet = False
             while not self.angleOkEvent.is_set():
