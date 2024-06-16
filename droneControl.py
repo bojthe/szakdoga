@@ -39,7 +39,7 @@ class DroneController:
 
         asyncio.run(main())
 
-        async def __reposition(drone):
+        async def reposition(drone):
             # clearing all events to have an initial state
             self.angleOkEvent.clear()
             self.distanceOkEvent.clear()
