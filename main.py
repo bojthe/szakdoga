@@ -1,4 +1,5 @@
 import droneControl
+import videoProcessing
 import time
 import threading
 
@@ -27,15 +28,11 @@ if __name__ == '__main__':
     flyingThread = threading.Thread(target=controller.flyAutomatic, daemon=True)
     flyingThread.start()
 
-    print("[main thread] Setting distance event")
-    distanceOkEvent.set()
-    time.sleep(0.2)
-    print("[main thread] Setting angle event")
-    angleOkEvent.set()
-    time.sleep(1)
-    print("[main thread] clearing distance event")
-    distanceOkEvent.clear()
-    time.sleep(3)
+    processor = videoProcessing.videoProcessor(angleOkEvent, distanceOkEvent, verticalOkEvent, horizontalOkEvent,
+                                              turnClockwiseEvent, turnCounterClockwiseEvent, moveLeftEvent, moveRightEvent,
+                                              moveUpEvent, moveDownEvent, moveForwardEvent, moveBackwardEvent,
+                                              decodeQrEvent, failedEvent)
+    processor.process()
 
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
