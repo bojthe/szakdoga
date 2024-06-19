@@ -115,6 +115,7 @@ class ControlGUI:
     def __takeOffButtonClicked(self):
         takeoffEvent.set()
 
+        self.takeOffButton.configure(state=tkinter.DISABLED)
         self.correctionButton.configure(state=tkinter.NORMAL)
         self.landButton.configure(state=tkinter.NORMAL)
         self.turnClockwiseButton.configure(state=tkinter.NORMAL)
@@ -129,7 +130,20 @@ class ControlGUI:
 
 
     def __landButtonClicked(self):
-        pass
+        landEvent.set()
+
+        self.takeOffButton.configure(state=tkinter.NORMAL)
+        self.correctionButton.configure(state=tkinter.DISABLED)
+        self.landButton.configure(state=tkinter.DISABLED)
+        self.turnClockwiseButton.configure(state=tkinter.DISABLED)
+        self.turnCounterclockwiseButton.configure(state=tkinter.DISABLED)
+        self.moveForwardButton.configure(state=tkinter.DISABLED)
+        self.moveBackwardButton.configure(state=tkinter.DISABLED)
+        self.moveLeftButton.configure(state=tkinter.DISABLED)
+        self.moveRightButton.configure(state=tkinter.DISABLED)
+        self.stopButton.configure(state=tkinter.DISABLED)
+        self.ascendButton.configure(state=tkinter.DISABLED)
+        self.descendButton.configure(state=tkinter.DISABLED)
 
     def __turnClockwiseButtonClicked(self):
         pass
