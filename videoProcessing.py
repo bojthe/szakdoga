@@ -56,7 +56,7 @@ class videoProcessor:
                         cv2.imshow('video_input', frame)
                         if frameCount > 100 and nothingFound == True:
                             frameCount = 0
-                            print("FAILURE. QR code not found.")
+                            print("[video processor] FAILURE. QR code not found.")
                             self.angleOkEvent.set()
                             self.distanceOkEvent.set()
                             self.verticalOkEvent.set()

@@ -1,6 +1,6 @@
-import threading
 import asyncio
 from tello_asyncio import Tello
+
 
 class DroneController:
 
