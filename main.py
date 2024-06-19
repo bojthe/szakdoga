@@ -11,6 +11,9 @@ angleOkEvent = threading.Event()
 distanceOkEvent = threading.Event()
 verticalOkEvent = threading.Event()
 horizontalOkEvent = threading.Event()
+takeoffEvent = threading.Event()
+landEvent = threading.Event()
+stopEvent = threading.Event()
 turnClockwiseEvent = threading.Event()
 turnCounterClockwiseEvent = threading.Event()
 moveLeftEvent = threading.Event()
@@ -25,6 +28,9 @@ failedEvent = threading.Event()
 class ControlGUI:
 
     def __init__(self):
+        self.lastEventSet = None
+        self.lastActiveButton = None
+
         self.window = tkinter.Tk()
         self.window.geometry("800x540")
         self.window.columnconfigure(0, weight=3)
@@ -107,7 +113,20 @@ class ControlGUI:
         self.window.mainloop()
 
     def __takeOffButtonClicked(self):
-        pass
+        takeoffEvent.set()
+
+        self.correctionButton.configure(state=tkinter.NORMAL)
+        self.landButton.configure(state=tkinter.NORMAL)
+        self.turnClockwiseButton.configure(state=tkinter.NORMAL)
+        self.turnCounterclockwiseButton.configure(state=tkinter.NORMAL)
+        self.moveForwardButton.configure(state=tkinter.NORMAL)
+        self.moveBackwardButton.configure(state=tkinter.NORMAL)
+        self.moveLeftButton.configure(state=tkinter.NORMAL)
+        self.moveRightButton.configure(state=tkinter.NORMAL)
+        self.stopButton.configure(state=tkinter.NORMAL)
+        self.ascendButton.configure(state=tkinter.NORMAL)
+        self.descendButton.configure(state=tkinter.NORMAL)
+
 
     def __landButtonClicked(self):
         pass
