@@ -135,6 +135,7 @@ class ControlGUI:
         self.descendButton.configure(state=tkinter.NORMAL)
 
     def __landButtonClicked(self):
+        self.__clearLastCommand()
         landEvent.set()
 
         self.takeOffButton.configure(state=tkinter.NORMAL)
@@ -261,17 +262,17 @@ class ControlGUI:
             self.lastEventSet.set()
 
 
-def cv2ToTkinter(cv_img):
-    # Convert the image from BGR to RGB format
-    cv_img_rgb = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
-    # Convert the image to a PIL Image
-    pil_img = Image.fromarray(cv_img_rgb)
-    # Convert the PIL Image to a Tkinter Image
-    tk_img = ImageTk.PhotoImage(image=pil_img)
-    return tk_img
+    def cv2ToTkinter(cv_img):
+        # Convert the image from BGR to RGB format
+        cv_img_rgb = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
+        # Convert the image to a PIL Image
+        pil_img = Image.fromarray(cv_img_rgb)
+        # Convert the PIL Image to a Tkinter Image
+        tk_img = ImageTk.PhotoImage(image=pil_img)
+        return tk_img
 
-def updateImage(img, label):
-    label.config(image=img)
+    def updateImage(img, label):
+        label.config(image=img)
 
 
 # Press the green button in the gutter to run the script.
