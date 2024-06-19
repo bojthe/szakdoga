@@ -5,6 +5,8 @@ import cv2
 import tkinter
 from PIL import Image, ImageTk
 
+ICON_SIZE = 30
+
 angleOkEvent = threading.Event()
 distanceOkEvent = threading.Event()
 verticalOkEvent = threading.Event()
@@ -47,46 +49,47 @@ class ControlGUI:
         self.controlsFrame.columnconfigure(2, weight=1)
 
         self.videoLabel = tkinter.Label(self.videoFrame, text="Video Feed")
-        self.videoLabel.grid(column=0,row=0)
+        self.videoLabel.grid(column=0, row=0)
         self.videoFeed = tkinter.Label(self.videoFrame)
         self.videoFeed.grid(column=0, row=1)
 
+        takeOffIcon = ImageTk.PhotoImage(Image.open(".\\Icons\\plane-departure.png").resize((ICON_SIZE, ICON_SIZE)))
+        correctionIcon = ImageTk.PhotoImage(Image.open(".\\Icons\\qr.png").resize((ICON_SIZE, ICON_SIZE)))
+        landIcon = ImageTk.PhotoImage(Image.open(".\\Icons\\plane-arrival.png").resize((ICON_SIZE, ICON_SIZE)))
+        turnClockwiseIcon = ImageTk.PhotoImage(Image.open(".\\Icons\\rotate-right.png").resize((ICON_SIZE, ICON_SIZE)))
+        turnCounterclockwiseIcon = ImageTk.PhotoImage(Image.open(".\\Icons\\rotate-left.png").resize((ICON_SIZE, ICON_SIZE)))
+        moveForwardIcon = ImageTk.PhotoImage(Image.open(".\\Icons\\arrow-circle-up.png").resize((ICON_SIZE, ICON_SIZE)))
+        moveBackwardIcon = ImageTk.PhotoImage(Image.open(".\\Icons\\arrow-circle-down.png").resize((ICON_SIZE, ICON_SIZE)))
+        moveLeftIcon = ImageTk.PhotoImage(Image.open(".\\Icons\\arrow-circle-left.png").resize((ICON_SIZE, ICON_SIZE)))
+        moveRightIcon = ImageTk.PhotoImage(Image.open(".\\Icons\\arrow-circle-right.png").resize((ICON_SIZE, ICON_SIZE)))
+        stopIcon = ImageTk.PhotoImage(Image.open(".\\Icons\\stop-circle.png").resize((ICON_SIZE, ICON_SIZE)))
+        ascendIcon = ImageTk.PhotoImage(Image.open(".\\Icons\\sort-circle-up.png").resize((ICON_SIZE, ICON_SIZE)))
+        descendIcon = ImageTk.PhotoImage(Image.open(".\\Icons\\sort-circle-down.png").resize((ICON_SIZE, ICON_SIZE)))
+
         self.takeOffButton = tkinter.Button(self.controlsFrame, relief=tkinter.RAISED,
-                                            command=self.__takeOffButtonClicked, text="Take Off" )
-        #command = self.__takeOffButtonClicked, text = "Take Off" )
+                                            command=self.__takeOffButtonClicked, image=takeOffIcon )
         self.landButton = tkinter.Button(self.controlsFrame, relief=tkinter.RAISED, state=tkinter.DISABLED,
-                                         command=self.__landButtonClicked, text="Land" )
-        #command = self.__landButtonClicked, text = "Land" )
+                                         command=self.__landButtonClicked, image=landIcon )
         self.turnClockwiseButton = tkinter.Button(self.controlsFrame, relief=tkinter.RAISED, state=tkinter.DISABLED,
-                                                  command=self.__turnClockwiseButtonClicked, text="Clockwise")
-        #command=self.__turnClockwiseButtonClicked, text="Clockwise")
+                                                  command=self.__turnClockwiseButtonClicked, image=turnClockwiseIcon)
         self.turnCounterclockwiseButton = tkinter.Button(self.controlsFrame, relief=tkinter.RAISED, state=tkinter.DISABLED,
-                                                         command=self.__turnCounterclockwiseButtonClicked, text="Counterclockwise")
-        #command=self.__turnCounterclockwiseButtonClicked, text="Counterclockwise")
+                                                         command=self.__turnCounterclockwiseButtonClicked, image=turnCounterclockwiseIcon)
         self.moveForwardButton = tkinter.Button(self.controlsFrame, relief=tkinter.RAISED, state=tkinter.DISABLED,
-                                                command=self.__moveForwardButtonClicked, text="Forward")
-        #command=self.__moveForwardButtonClicked, text="Forward")
+                                                command=self.__moveForwardButtonClicked, image=moveForwardIcon)
         self.moveBackwardButton = tkinter.Button(self.controlsFrame, relief=tkinter.RAISED, state=tkinter.DISABLED,
-                                                 command=self.__moveBackwardButtonClicked, text="Backward")
-        #command=self.__moveBackwardButtonClicked, text="Backward")
+                                                 command=self.__moveBackwardButtonClicked, image=moveBackwardIcon)
         self.moveLeftButton = tkinter.Button(self.controlsFrame, relief=tkinter.RAISED, state=tkinter.DISABLED,
-                                             command=self.__moveLeftButtonClicked, text="Left")
-        #command=self.__moveLeftButtonClicked, text="Left")
+                                             command=self.__moveLeftButtonClicked, image=moveLeftIcon)
         self.moveRightButton = tkinter.Button(self.controlsFrame, relief=tkinter.RAISED, state=tkinter.DISABLED,
-                                              command=self.__moveRightButtonClicked, text="Right")
-        #command=self.__moveRightButtonClicked, text="Right")
+                                              command=self.__moveRightButtonClicked, image=moveRightIcon)
         self.stopButton = tkinter.Button(self.controlsFrame, relief=tkinter.RAISED, state=tkinter.DISABLED,
-                                         command=self.__stopButtonClicked, text="Stop")
-        #command=self.__stopButtonClicked, text="Stop")
+                                         command=self.__stopButtonClicked, image=stopIcon)
         self.ascendButton = tkinter.Button(self.controlsFrame, relief=tkinter.RAISED, state=tkinter.DISABLED,
-                                           command=self.__ascendButtonClicked, text="Ascend")
-        #command=self.__ascendButtonClicked, text="Ascend")
+                                           command=self.__ascendButtonClicked, image=ascendIcon)
         self.descendButton = tkinter.Button(self.controlsFrame, relief=tkinter.RAISED, state=tkinter.DISABLED,
-                                            command=self.__descendButtonClicked, text="Descend")
-        #command=self.__descendButtonClicked, text="Descend")
+                                            command=self.__descendButtonClicked, image=descendIcon)
         self.correctionButton = tkinter.Button(self.controlsFrame, relief=tkinter.RAISED, state=tkinter.DISABLED,
-                                               command=self.__correctionButtonClicked, text="Correction")
-        #command=self.__correctionButtonClicked, text="Correction")
+                                               command=self.__correctionButtonClicked, image=correctionIcon)
 
         self.takeOffButton.grid(column=0, row=2, sticky='nesw')
         self.correctionButton.grid(column=1, row=2, sticky='nesw')
