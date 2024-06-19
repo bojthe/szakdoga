@@ -37,6 +37,7 @@ class ControlGUI:
         self.window.columnconfigure(1, weight=1)
         self.window.rowconfigure(0, weight=9)
         self.window.rowconfigure(1, weight=1)
+        self.defaultColor = self.window.cget("bg")
 
         self.videoFrame = tkinter.Frame(self.window)
         self.videoFrame.configure(background="yellow")
@@ -112,6 +113,11 @@ class ControlGUI:
 
         self.window.mainloop()
 
+    def __clearLastCommand(self):
+        if self.lastEventSet is not None:
+            self.lastEventSet.clear()
+            self.lastActiveButton.configure(background=self.defaultColor)
+
     def __takeOffButtonClicked(self):
         takeoffEvent.set()
 
@@ -127,7 +133,6 @@ class ControlGUI:
         self.stopButton.configure(state=tkinter.NORMAL)
         self.ascendButton.configure(state=tkinter.NORMAL)
         self.descendButton.configure(state=tkinter.NORMAL)
-
 
     def __landButtonClicked(self):
         landEvent.set()
@@ -146,34 +151,114 @@ class ControlGUI:
         self.descendButton.configure(state=tkinter.DISABLED)
 
     def __turnClockwiseButtonClicked(self):
-        pass
+        self.__clearLastCommand()
+        if self.lastActiveButton == self.turnClockwiseButton:
+            self.lastActiveButton = None
+            self.lastEventSet = None
+        else:
+            self.lastActiveButton = self.turnClockwiseButton
+            self.lastActiveButton.configure(background="light blue")
+            self.lastEventSet = turnClockwiseEvent
+            self.lastEventSet.set()
 
     def __turnCounterclockwiseButtonClicked(self):
-        pass
+        self.__clearLastCommand()
+        if self.lastActiveButton == self.turnCounterclockwiseButton:
+            self.lastActiveButton = None
+            self.lastEventSet = None
+        else:
+            self.lastActiveButton = self.turnCounterclockwiseButton
+            self.lastActiveButton.configure(background="light blue")
+            self.lastEventSet = turnCounterClockwiseEvent
+            self.lastEventSet.set()
 
     def __moveForwardButtonClicked(self):
-        pass
+        self.__clearLastCommand()
+        if self.lastActiveButton == self.moveForwardButton:
+            self.lastActiveButton = None
+            self.lastEventSet = None
+        else:
+            self.lastActiveButton = self.moveForwardButton
+            self.lastActiveButton.configure(background="light blue")
+            self.lastEventSet = moveForwardEvent
+            self.lastEventSet.set()
 
     def __moveBackwardButtonClicked(self):
-        pass
+        self.__clearLastCommand()
+        if self.lastActiveButton == self.moveBackwardButton:
+            self.lastActiveButton = None
+            self.lastEventSet = None
+        else:
+            self.lastActiveButton = self.moveBackwardButton
+            self.lastActiveButton.configure(background="light blue")
+            self.lastEventSet = moveBackwardEvent
+            self.lastEventSet.set()
 
     def __moveLeftButtonClicked(self):
-        pass
+        self.__clearLastCommand()
+        if self.lastActiveButton == self.moveLeftButton:
+            self.lastActiveButton = None
+            self.lastEventSet = None
+        else:
+            self.lastActiveButton = self.moveLeftButton
+            self.lastActiveButton.configure(background="light blue")
+            self.lastEventSet = moveLeftEvent
+            self.lastEventSet.set()
 
     def __moveRightButtonClicked(self):
-        pass
+        self.__clearLastCommand()
+        if self.lastActiveButton == self.moveRightButton:
+            self.lastActiveButton = None
+            self.lastEventSet = None
+        else:
+            self.lastActiveButton = self.moveRightButton
+            self.lastActiveButton.configure(background="light blue")
+            self.lastEventSet = moveRightEvent
+            self.lastEventSet.set()
 
     def __stopButtonClicked(self):
-        pass
+        self.__clearLastCommand()
+        if self.lastActiveButton == self.stopButton:
+            self.lastActiveButton = None
+            self.lastEventSet = None
+        else:
+            self.lastActiveButton = self.stopButton
+            self.lastActiveButton.configure(background="light blue")
+            self.lastEventSet = stopEvent
+            self.lastEventSet.set()
 
     def __ascendButtonClicked(self):
-        pass
+        self.__clearLastCommand()
+        if self.lastActiveButton == self.ascendButton:
+            self.lastActiveButton = None
+            self.lastEventSet = None
+        else:
+            self.lastActiveButton = self.ascendButton
+            self.lastActiveButton.configure(background="light blue")
+            self.lastEventSet = moveUpEvent
+            self.lastEventSet.set()
 
     def __descendButtonClicked(self):
-        pass
+        self.__clearLastCommand()
+        if self.lastActiveButton == self.descendButton:
+            self.lastActiveButton = None
+            self.lastEventSet = None
+        else:
+            self.lastActiveButton = self.descendButton
+            self.lastActiveButton.configure(background="light blue")
+            self.lastEventSet = moveDownEvent
+            self.lastEventSet.set()
 
     def __correctionButtonClicked(self):
-        pass
+        self.__clearLastCommand()
+        if self.lastActiveButton == self.correctionButton:
+            self.lastActiveButton = None
+            self.lastEventSet = None
+        else:
+            self.lastActiveButton = self.correctionButton
+            self.lastActiveButton.configure(background="light blue")
+            self.lastEventSet = decodeQrEvent
+            self.lastEventSet.set()
 
 
 def cv2ToTkinter(cv_img):
