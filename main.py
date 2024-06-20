@@ -3,6 +3,7 @@ import videoProcessing
 import threading
 import cv2
 import tkinter
+import tktooltip
 from PIL import Image, ImageTk
 
 ICON_SIZE = 30
@@ -28,9 +29,11 @@ failedEvent = threading.Event()
 class ControlGUI:
 
     def __init__(self):
+        ### Keeping track of the last entities we have interacted with
         self.lastEventSet = None
         self.lastActiveButton = None
 
+        ### Building the GUI
         self.window = tkinter.Tk()
         self.window.geometry("800x540")
         self.window.columnconfigure(0, weight=3)
@@ -39,10 +42,17 @@ class ControlGUI:
         self.window.rowconfigure(1, weight=1)
         self.defaultColor = self.window.cget("bg")
 
+        ### Frame Containing the Video
         self.videoFrame = tkinter.Frame(self.window)
         self.videoFrame.configure(background="yellow")
         self.videoFrame.grid(column=0,row=0, sticky='nesw')
         self.videoFrame.rowconfigure(1, weight=1)
+        self.videoLabel = tkinter.Label(self.videoFrame, text="Video Feed")
+        self.videoLabel.grid(column=0, row=0)
+        self.videoFeed = tkinter.Label(self.videoFrame)
+        self.videoFeed.grid(column=0, row=1)
+
+        ### Frame containing the Drone Controls
         self.controlsFrame = tkinter.Frame(self.window)
         self.controlsFrame.configure(background="red")
         self.controlsFrame.grid(column=1, row=0, rowspan=2, sticky='nesw')
@@ -55,11 +65,7 @@ class ControlGUI:
         self.controlsFrame.columnconfigure(1, weight=1)
         self.controlsFrame.columnconfigure(2, weight=1)
 
-        self.videoLabel = tkinter.Label(self.videoFrame, text="Video Feed")
-        self.videoLabel.grid(column=0, row=0)
-        self.videoFeed = tkinter.Label(self.videoFrame)
-        self.videoFeed.grid(column=0, row=1)
-
+        ### Retrieving the icons needed for the control buttons
         takeOffIcon = ImageTk.PhotoImage(Image.open(".\\Icons\\plane-departure.png").resize((ICON_SIZE, ICON_SIZE)))
         correctionIcon = ImageTk.PhotoImage(Image.open(".\\Icons\\qr.png").resize((ICON_SIZE, ICON_SIZE)))
         landIcon = ImageTk.PhotoImage(Image.open(".\\Icons\\plane-arrival.png").resize((ICON_SIZE, ICON_SIZE)))
@@ -73,6 +79,7 @@ class ControlGUI:
         ascendIcon = ImageTk.PhotoImage(Image.open(".\\Icons\\sort-circle-up.png").resize((ICON_SIZE, ICON_SIZE)))
         descendIcon = ImageTk.PhotoImage(Image.open(".\\Icons\\sort-circle-down.png").resize((ICON_SIZE, ICON_SIZE)))
 
+        ### Creating and binding the control buttons
         self.takeOffButton = tkinter.Button(self.controlsFrame, relief=tkinter.RAISED,
                                             command=self.__takeOffButtonClicked, image=takeOffIcon )
         self.landButton = tkinter.Button(self.controlsFrame, relief=tkinter.RAISED, state=tkinter.DISABLED,
@@ -98,6 +105,7 @@ class ControlGUI:
         self.correctionButton = tkinter.Button(self.controlsFrame, relief=tkinter.RAISED, state=tkinter.DISABLED,
                                                command=self.__correctionButtonClicked, image=correctionIcon)
 
+        ### Placing the buttons on a grid
         self.takeOffButton.grid(column=0, row=2, sticky='nesw')
         self.correctionButton.grid(column=1, row=2, sticky='nesw')
         self.landButton.grid(column=2, row=2, sticky='nesw')
@@ -111,6 +119,22 @@ class ControlGUI:
         self.ascendButton.grid(column=0, row=5, sticky='nesw')
         self.descendButton.grid(column=2, row=5, sticky='nesw')
 
+        ### Tooltips for everything
+        tktooltip.ToolTip(self.takeOffButton, msg="Sends a Take Off command to the drone.", delay=2.0)
+        tktooltip.ToolTip(self.correctionButton, msg="Initiates the visual input-based position correction process.", delay=2.0)
+        tktooltip.ToolTip(self.landButton, msg="Sends a Land command to the drone.", delay=2.0)
+        tktooltip.ToolTip(self.turnClockwiseButton, msg="Sends a Clockwise turn command to the drone.", delay=2.0)
+        tktooltip.ToolTip(self.turnCounterclockwiseButton, msg="Sends a Counterclockwise turn command to the drone.", delay=2.0)
+        tktooltip.ToolTip(self.moveForwardButton, msg="Sends a Forward movement command to the drone.", delay=2.0)
+        tktooltip.ToolTip(self.moveBackwardButton, msg="Sends a Backward movement command to the drone.", delay=2.0)
+        tktooltip.ToolTip(self.moveLeftButton, msg="Sends a Leftward movement command to the drone.", delay=2.0)
+        tktooltip.ToolTip(self.moveRightButton, msg= "Sends a Rightward movement command to the drone.", delay=2.0)
+        tktooltip.ToolTip(self.stopButton, msg="Makes the drone stop where it is.", delay=2.0)
+        tktooltip.ToolTip(self.ascendButton, msg="Sends an Ascend command to the drone.", delay=2.0)
+        tktooltip.ToolTip(self.descendButton, msg="Sends a Descend command to the drone.", delay=2.0)
+
+
+        ### Starting the GUI loop
         self.window.mainloop()
 
     def __clearLastCommand(self):
@@ -261,18 +285,17 @@ class ControlGUI:
             self.lastEventSet = decodeQrEvent
             self.lastEventSet.set()
 
-
-    def cv2ToTkinter(cv_img):
-        # Convert the image from BGR to RGB format
-        cv_img_rgb = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
-        # Convert the image to a PIL Image
-        pil_img = Image.fromarray(cv_img_rgb)
-        # Convert the PIL Image to a Tkinter Image
-        tk_img = ImageTk.PhotoImage(image=pil_img)
-        return tk_img
-
     def updateImage(img, label):
         label.config(image=img)
+
+def cv2ToTkinter(cv_img):
+    # Convert the image from BGR to RGB format
+    cv_img_rgb = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
+    # Convert the image to a PIL Image
+    pil_img = Image.fromarray(cv_img_rgb)
+    # Convert the PIL Image to a Tkinter Image
+    tk_img = ImageTk.PhotoImage(image=pil_img)
+    return tk_img
 
 
 # Press the green button in the gutter to run the script.
