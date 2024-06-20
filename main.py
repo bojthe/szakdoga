@@ -50,6 +50,7 @@ class ControlGUI:
 
         ### Building the GUI
         self.window = tkinter.Tk()
+        self.window.title("Drone Panel")
         self.window.geometry("1465x750")
         self.window.columnconfigure(0, weight=6)
         self.window.columnconfigure(1, weight=1)
@@ -82,12 +83,10 @@ class ControlGUI:
         self.controlsFrame.columnconfigure(2, weight=1)
         self.controlsLabel = tkinter.Label(self.controlsFrame, text="Drone Controls")
         self.controlsLabel.grid(column=0, row=2, columnspan=3, sticky='nesw')
-        self.logHeaderLabel = tkinter.Label(self.controlsFrame, text="Logs")
-        self.logHeaderLabel.grid(column=0, row=0, columnspan=3, sticky='nesw')
-        self.logLabel = tkinter.Label(self.controlsFrame, text="")
-        scrollbar = tkinter.Scrollbar(self.logLabel, orient="vertical")
-        scrollbar.pack(side=tkinter.RIGHT, fill=tkinter.Y)
-        self.logLabel.grid(column=0, row=1, columnspan=3, sticky='nesw')
+        self.tipsHeaderLabel = tkinter.Label(self.controlsFrame, text="Description")
+        self.tipsHeaderLabel.grid(column=0, row=0, columnspan=3, sticky='nesw')
+        self.tipsLabel = tkinter.Label(self.controlsFrame, state=tkinter.DISABLED)
+        self.tipsLabel.grid(column=0, row=1, columnspan=3, sticky='nesw')
 
         ### Retrieving the icons needed for the control buttons
         takeOffIcon = ImageTk.PhotoImage(Image.open(".\\Icons\\plane-departure.png").resize((ICON_SIZE, ICON_SIZE)))
@@ -157,22 +156,19 @@ class ControlGUI:
         tktooltip.ToolTip(self.ascendButton, msg="Sends an Ascend command to the drone.", delay=2.0)
         tktooltip.ToolTip(self.descendButton, msg="Sends a Descend command to the drone.", delay=2.0)
 
-        # Creating droneControl and videoProcessing threads
-        processor = videoProcessing.videoProcessor(angleOkEvent, distanceOkEvent, verticalOkEvent, horizontalOkEvent,
-                                                turnClockwiseEvent, turnCounterClockwiseEvent, moveLeftEvent, moveRightEvent,
-                                                moveUpEvent, moveDownEvent, moveForwardEvent, moveBackwardEvent,
-                                                decodeQrEvent, failedEvent, videoQueue, stopVideoEvent)
-        self.videoProcessingThread = threading.Thread(target=processor.process, daemon=True)
-        self.videoProcessingThread.start()
+        # Dialog for choice between Automatic and Manual drone control
+        self.isAutomatic = None
+        self.dialog = tkinter.Toplevel(self.window)
+        self.dialog.title("Chose a startup option!")
 
-        controller = droneControl.DroneController(angleOkEvent, distanceOkEvent, verticalOkEvent, horizontalOkEvent, turnClockwiseEvent,
-                                                  turnCounterClockwiseEvent, moveLeftEvent, moveRightEvent, moveUpEvent,
-                                                  moveDownEvent, moveForwardEvent, moveBackwardEvent, decodeQrEvent,
-                                                  failedEvent, stopEvent, stopDroneEvent, takeOffEvent=takeoffEvent,
-                                                  landEvent=landEvent, correctionEvent=correctionEvent)
-        #self.droneControlThread = threading.Thread(target=controller.flyAutomatic, daemon=True)
-        self.droneControlThread = threading.Thread(target=controller.flyManual, daemon=True)
-        self.droneControlThread.start()
+        self.dialogLabel = tkinter.Label(self.dialog, text="Please choose a startup option!")
+        self.dialogLabel.pack(padx=20, pady=10)
+
+        autoButton = tkinter.Button(self.dialog, text="Automatic", command=lambda: [self.__setIsAutomatic(True), self.__startThreads(), self.dialog.destroy()])
+        manualButton = tkinter.Button(self.dialog, text="Manual", command=lambda: [self.__setIsAutomatic(False), self.__startThreads(), self.dialog.destroy()])
+        autoButton.pack(side=tkinter.LEFT, padx=10, pady=10)
+        manualButton.pack(side=tkinter.RIGHT, padx=10, pady=10)
+
 
         # Starting video feed update
         self.__updateImage(videoQueue, stopVideoEvent)
@@ -182,6 +178,32 @@ class ControlGUI:
 
         ### Starting the GUI loop
         self.window.mainloop()
+
+    def __startThreads(self):
+        # Creating droneControl and videoProcessing threads
+        processor = videoProcessing.videoProcessor(angleOkEvent, distanceOkEvent, verticalOkEvent, horizontalOkEvent,
+                                                   turnClockwiseEvent, turnCounterClockwiseEvent, moveLeftEvent,
+                                                   moveRightEvent,
+                                                   moveUpEvent, moveDownEvent, moveForwardEvent, moveBackwardEvent,
+                                                   decodeQrEvent, failedEvent, videoQueue, stopVideoEvent)
+        self.videoProcessingThread = threading.Thread(target=processor.process, daemon=True)
+        self.videoProcessingThread.start()
+
+        controller = droneControl.DroneController(angleOkEvent, distanceOkEvent, verticalOkEvent, horizontalOkEvent,
+                                                  turnClockwiseEvent,
+                                                  turnCounterClockwiseEvent, moveLeftEvent, moveRightEvent, moveUpEvent,
+                                                  moveDownEvent, moveForwardEvent, moveBackwardEvent, decodeQrEvent,
+                                                  failedEvent, stopEvent, stopDroneEvent, takeOffEvent=takeoffEvent,
+                                                  landEvent=landEvent, correctionEvent=correctionEvent)
+
+        if self.isAutomatic:
+            self.takeOffButton.configure(state=tkinter.DISABLED)
+            self.tipsLabel.configure(text="AUTOMATIC MODE\n\nIn this mode you cannot\npilot the drone with\nthe controls provided below.")
+            self.droneControlThread = threading.Thread(target=controller.flyAutomatic, daemon=True)
+        else:
+            self.tipsLabel.configure(text="MANUAL MODE\n\nIn this mode you can\npilot the drone with\nthe controls provided below.\nClick the take off button\nto start!")
+            self.droneControlThread = threading.Thread(target=controller.flyManual, daemon=True)
+        self.droneControlThread.start()
 
     def __clearLastCommand(self):
         if self.lastEventSet is not None:
@@ -346,6 +368,9 @@ class ControlGUI:
         self.videoProcessingThread.join()
         self.droneControlThread.join()
         self.window.destroy()
+
+    def __setIsAutomatic(self, flag):
+        self.isAutomatic = flag
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
