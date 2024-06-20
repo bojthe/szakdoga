@@ -341,7 +341,9 @@ class ControlGUI:
 
     def __onClose(self):
         stopVideoEvent.set()
+        stopDroneEvent.set()
         self.videoProcessingThread.join()
+        self.droneControlThread.join()
         self.window.destroy()
 
 # Press the green button in the gutter to run the script.
