@@ -26,6 +26,7 @@ moveForwardEvent = threading.Event()
 moveBackwardEvent = threading.Event()
 decodeQrEvent = threading.Event()
 failedEvent = threading.Event()
+correctionEvent = threading.Event()
 
 stopVideoEvent = threading.Event()
 stopDroneEvent = threading.Event()
@@ -71,14 +72,22 @@ class ControlGUI:
         ### Frame containing the Drone Controls
         self.controlsFrame = tkinter.Frame(self.window)
         self.controlsFrame.grid(column=1, row=0, sticky='nesw')
-        self.controlsFrame.rowconfigure(0, weight=5)
-        self.controlsFrame.rowconfigure(2, weight=1)
+        self.controlsFrame.rowconfigure(1, weight=5)
         self.controlsFrame.rowconfigure(3, weight=1)
         self.controlsFrame.rowconfigure(4, weight=1)
         self.controlsFrame.rowconfigure(5, weight=1)
+        self.controlsFrame.rowconfigure(6, weight=1)
         self.controlsFrame.columnconfigure(0, weight=1)
         self.controlsFrame.columnconfigure(1, weight=1)
         self.controlsFrame.columnconfigure(2, weight=1)
+        self.controlsLabel = tkinter.Label(self.controlsFrame, text="Drone Controls")
+        self.controlsLabel.grid(column=0, row=2, columnspan=3, sticky='nesw')
+        self.logHeaderLabel = tkinter.Label(self.controlsFrame, text="Logs")
+        self.logHeaderLabel.grid(column=0, row=0, columnspan=3, sticky='nesw')
+        self.logLabel = tkinter.Label(self.controlsFrame, text="")
+        scrollbar = tkinter.Scrollbar(self.logLabel, orient="vertical")
+        scrollbar.pack(side=tkinter.RIGHT, fill=tkinter.Y)
+        self.logLabel.grid(column=0, row=1, columnspan=3, sticky='nesw')
 
         ### Retrieving the icons needed for the control buttons
         takeOffIcon = ImageTk.PhotoImage(Image.open(".\\Icons\\plane-departure.png").resize((ICON_SIZE, ICON_SIZE)))
@@ -121,18 +130,18 @@ class ControlGUI:
                                                command=self.__correctionButtonClicked, image=correctionIcon)
 
         ### Placing the buttons on a grid
-        self.takeOffButton.grid(column=0, row=2, sticky='nesw')
-        self.correctionButton.grid(column=1, row=2, sticky='nesw')
-        self.landButton.grid(column=2, row=2, sticky='nesw')
-        self.turnClockwiseButton.grid(column=0, row=3, sticky='nesw')
-        self.turnCounterclockwiseButton.grid(column=2, row=3, sticky='nesw')
-        self.moveForwardButton.grid(column=1, row=3, sticky='nesw')
-        self.moveBackwardButton.grid(column=1, row=5, sticky='nesw')
-        self.moveLeftButton.grid(column=0, row=4, sticky='nesw')
-        self.moveRightButton.grid(column=2, row=4, sticky='nesw')
-        self.stopButton.grid(column=1, row=4, sticky='nesw')
-        self.ascendButton.grid(column=0, row=5, sticky='nesw')
-        self.descendButton.grid(column=2, row=5, sticky='nesw')
+        self.takeOffButton.grid(column=0, row=3, sticky='nesw')
+        self.correctionButton.grid(column=1, row=3, sticky='nesw')
+        self.landButton.grid(column=2, row=3, sticky='nesw')
+        self.turnClockwiseButton.grid(column=0, row=4, sticky='nesw')
+        self.turnCounterclockwiseButton.grid(column=2, row=4, sticky='nesw')
+        self.moveForwardButton.grid(column=1, row=4, sticky='nesw')
+        self.moveBackwardButton.grid(column=1, row=6, sticky='nesw')
+        self.moveLeftButton.grid(column=0, row=5, sticky='nesw')
+        self.moveRightButton.grid(column=2, row=5, sticky='nesw')
+        self.stopButton.grid(column=1, row=5, sticky='nesw')
+        self.ascendButton.grid(column=0, row=6, sticky='nesw')
+        self.descendButton.grid(column=2, row=6, sticky='nesw')
 
         ### Tooltips for everything
         tktooltip.ToolTip(self.takeOffButton, msg="Sends a Take Off command to the drone.", delay=2.0)
@@ -155,6 +164,14 @@ class ControlGUI:
                                                 decodeQrEvent, failedEvent, videoQueue, stopVideoEvent)
         self.videoProcessingThread = threading.Thread(target=processor.process, daemon=True)
         self.videoProcessingThread.start()
+
+        controller = droneControl.DroneController(angleOkEvent, distanceOkEvent, verticalOkEvent, horizontalOkEvent, turnClockwiseEvent,
+                                                  turnCounterClockwiseEvent, moveLeftEvent, moveRightEvent, moveUpEvent,
+                                                  moveDownEvent, moveForwardEvent, moveBackwardEvent, decodeQrEvent,
+                                                  failedEvent, stopEvent, stopDroneEvent, takeOffEvent=takeoffEvent,
+                                                  landEvent=landEvent, correctionEvent=correctionEvent)
+        #self.droneControlThread = threading.Thread(target=controller.flyAutomatic, daemon=True)
+        self.droneControlThread = threading.Thread(target=controller.flyManual, daemon=True)
 
         # Starting video feed update
         self.__updateImage(videoQueue, stopVideoEvent)
@@ -310,7 +327,7 @@ class ControlGUI:
         else:
             self.lastActiveButton = self.correctionButton
             self.lastActiveButton.configure(background="light blue")
-            self.lastEventSet = decodeQrEvent
+            self.lastEventSet = correctionEvent
             self.lastEventSet.set()
 
     def __updateImage(self, queue, stopEvent):
