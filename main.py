@@ -4,6 +4,7 @@ import threading
 import cv2
 import tkinter
 import tktooltip
+import queue
 from PIL import Image, ImageTk
 
 ICON_SIZE = 30
@@ -26,6 +27,19 @@ moveBackwardEvent = threading.Event()
 decodeQrEvent = threading.Event()
 failedEvent = threading.Event()
 
+stopVideoEvent = threading.Event()
+stopDroneEvent = threading.Event()
+videoQueue = queue.Queue(maxsize=10)
+
+def cv2ToTkinter(cv_img):
+    # Convert the image from BGR to RGB format
+    cv_img_rgb = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
+    # Convert the image to a PIL Image
+    pil_img = Image.fromarray(cv_img_rgb)
+    # Convert the PIL Image to a Tkinter Image
+    tk_img = ImageTk.PhotoImage(image=pil_img)
+    return tk_img
+
 class ControlGUI:
 
     def __init__(self):
@@ -35,28 +49,29 @@ class ControlGUI:
 
         ### Building the GUI
         self.window = tkinter.Tk()
-        self.window.geometry("800x540")
-        self.window.columnconfigure(0, weight=3)
+        self.window.geometry("1465x750")
+        self.window.columnconfigure(0, weight=6)
         self.window.columnconfigure(1, weight=1)
-        self.window.rowconfigure(0, weight=9)
-        self.window.rowconfigure(1, weight=1)
+        self.window.rowconfigure(0, weight=1)
         self.defaultColor = self.window.cget("bg")
 
         ### Frame Containing the Video
         self.videoFrame = tkinter.Frame(self.window)
-        self.videoFrame.configure(background="yellow")
         self.videoFrame.grid(column=0,row=0, sticky='nesw')
+        self.videoFrame.rowconfigure(0, weight=0)
         self.videoFrame.rowconfigure(1, weight=1)
+        self.videoFrame.columnconfigure(0, weight=1)
         self.videoLabel = tkinter.Label(self.videoFrame, text="Video Feed")
-        self.videoLabel.grid(column=0, row=0)
+        self.videoLabel.grid(column=0, row=0, sticky='new')
         self.videoFeed = tkinter.Label(self.videoFrame)
-        self.videoFeed.grid(column=0, row=1)
+        self.videoFeed.configure(background="black")
+        self.videoFeed.grid(column=0, row=1, sticky='nesw')
+
 
         ### Frame containing the Drone Controls
         self.controlsFrame = tkinter.Frame(self.window)
-        self.controlsFrame.configure(background="red")
-        self.controlsFrame.grid(column=1, row=0, rowspan=2, sticky='nesw')
-        self.controlsFrame.rowconfigure(0, weight=1)
+        self.controlsFrame.grid(column=1, row=0, sticky='nesw')
+        self.controlsFrame.rowconfigure(0, weight=5)
         self.controlsFrame.rowconfigure(2, weight=1)
         self.controlsFrame.rowconfigure(3, weight=1)
         self.controlsFrame.rowconfigure(4, weight=1)
@@ -133,6 +148,19 @@ class ControlGUI:
         tktooltip.ToolTip(self.ascendButton, msg="Sends an Ascend command to the drone.", delay=2.0)
         tktooltip.ToolTip(self.descendButton, msg="Sends a Descend command to the drone.", delay=2.0)
 
+        # Creating droneControl and videoProcessing threads
+        processor = videoProcessing.videoProcessor(angleOkEvent, distanceOkEvent, verticalOkEvent, horizontalOkEvent,
+                                                turnClockwiseEvent, turnCounterClockwiseEvent, moveLeftEvent, moveRightEvent,
+                                                moveUpEvent, moveDownEvent, moveForwardEvent, moveBackwardEvent,
+                                                decodeQrEvent, failedEvent, videoQueue, stopVideoEvent)
+        self.videoProcessingThread = threading.Thread(target=processor.process, daemon=True)
+        self.videoProcessingThread.start()
+
+        # Starting video feed update
+        self.__updateImage(videoQueue, stopVideoEvent)
+
+        # Handling close event
+        self.window.protocol("WM_DELETE_WINDOW", self.__onClose)
 
         ### Starting the GUI loop
         self.window.mainloop()
@@ -285,18 +313,19 @@ class ControlGUI:
             self.lastEventSet = decodeQrEvent
             self.lastEventSet.set()
 
-    def updateImage(img, label):
-        label.config(image=img)
+    def __updateImage(self, queue, stopEvent):
+        if not queue.empty():
+            frame = queue.get()
+            tk_img = cv2ToTkinter(cv2.resize(frame, (1280, 720)))
+            self.videoFeed.config(image=tk_img)
+            self.videoFeed.image = tk_img
+        if not stopEvent.is_set():
+            self.videoFeed.after(1, self.__updateImage, queue, stopEvent)
 
-def cv2ToTkinter(cv_img):
-    # Convert the image from BGR to RGB format
-    cv_img_rgb = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
-    # Convert the image to a PIL Image
-    pil_img = Image.fromarray(cv_img_rgb)
-    # Convert the PIL Image to a Tkinter Image
-    tk_img = ImageTk.PhotoImage(image=pil_img)
-    return tk_img
-
+    def __onClose(self):
+        stopVideoEvent.set()
+        self.videoProcessingThread.join()
+        self.window.destroy()
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -328,3 +357,4 @@ if __name__ == '__main__':
 
     #window.mainloop()
     ControlGUI()
+

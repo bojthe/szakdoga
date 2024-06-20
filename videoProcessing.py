@@ -12,7 +12,7 @@ class videoProcessor:
 
     def __init__(self, angle, distance, vertical, horizontal, clockwise,
                  counterclockwise, left, right, up, down, forward, backward,
-                 decode, failed):
+                 decode, failed, videoQueue, threadStopEvent):
         self.angleOkEvent = angle
         self.distanceOkEvent = distance
         self.verticalOkEvent = vertical
@@ -27,17 +27,21 @@ class videoProcessor:
         self.moveBackwardEvent = backward
         self.decodeQrEvent = decode
         self.failedEvent = failed
+        self.threadStopEvent = threadStopEvent
+        self.videoQueue = videoQueue
 
-        self.capture = cv2.VideoCapture(VIDEO_URL)
+        #self.capture = cv2.VideoCapture(VIDEO_URL)
+        self.capture = cv2.VideoCapture("testVideo.mp4")
         self.decoder = cv2.QRCodeDetector()
 
     def process(self):
         try:
-            self.capture.open(VIDEO_URL)
+            # self.capture.open(VIDEO_URL)
+            self.capture.open("testVideo.mp4")
             frameCount = 0
             points, data = None, None
             nothingFound = True
-            while True:
+            while not self.threadStopEvent.is_set():
                 grabbed, frame = self.capture.read()
                 if grabbed:
                     if self.decodeQrEvent.is_set():
@@ -47,13 +51,14 @@ class videoProcessor:
                         frameCount = frameCount + 1
                         if points is not None and len(points) > 0 and data is not None:
                             nothingFound = False
-                            # print(data)
                             code = data.split("-")
                             if len(code) == 3:
                                 print(code[0] + " " + code[1] + " " + code[2])
                                 self.__interpretQR(frame, points[0], code[0], code[1], code[2])
 
-                        cv2.imshow('video_input', frame)
+                        if not self.videoQueue.full():
+                            self.videoQueue.put(frame)
+
                         if frameCount > 100 and nothingFound == True:
                             frameCount = 0
                             print("[video processor] FAILURE. QR code not found.")
@@ -64,7 +69,8 @@ class videoProcessor:
                             self.failedEvent.set()
                             break
                     else:
-                        cv2.imshow('video_input', frame)
+                        if not self.videoQueue.full():
+                            self.videoQueue.put(frame)
                         frameCount = 0
                 if cv2.waitKey(1) != -1:
                     break
@@ -73,7 +79,6 @@ class videoProcessor:
         finally:
             if self.capture:
                 self.capture.release()
-            cv2.destroyAllWindows()
 
     def __interpretQR(self, frame, points, horizontalPosition, verticalPosition, distance):
         if not self.angleOkEvent.is_set():
