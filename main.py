@@ -172,6 +172,7 @@ class ControlGUI:
                                                   landEvent=landEvent, correctionEvent=correctionEvent)
         #self.droneControlThread = threading.Thread(target=controller.flyAutomatic, daemon=True)
         self.droneControlThread = threading.Thread(target=controller.flyManual, daemon=True)
+        self.droneControlThread.start()
 
         # Starting video feed update
         self.__updateImage(videoQueue, stopVideoEvent)
