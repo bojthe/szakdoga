@@ -30,14 +30,12 @@ class videoProcessor:
         self.threadStopEvent = threadStopEvent
         self.videoQueue = videoQueue
 
-        #self.capture = cv2.VideoCapture(VIDEO_URL)
-        self.capture = cv2.VideoCapture("testVideo.mp4")
+        self.capture = cv2.VideoCapture(VIDEO_URL)
         self.decoder = cv2.QRCodeDetector()
 
     def process(self):
         try:
-            # self.capture.open(VIDEO_URL)
-            self.capture.open("testVideo.mp4")
+            self.capture.open(VIDEO_URL)
             frameCount = 0
             points, data = None, None
             nothingFound = True
@@ -72,8 +70,6 @@ class videoProcessor:
                         if not self.videoQueue.full():
                             self.videoQueue.put(frame)
                         frameCount = 0
-                if cv2.waitKey(1) != -1:
-                    break
         except KeyboardInterrupt:
             pass
         finally:
