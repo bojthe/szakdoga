@@ -374,32 +374,5 @@ class ControlGUI:
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    #print("[main thread] Creating controller thread")
-    #controller = droneControl.DroneController(angleOkEvent, distanceOkEvent, verticalOkEvent, horizontalOkEvent,
-    #                                         turnClockwiseEvent, turnCounterClockwiseEvent, moveLeftEvent, moveRightEvent,
-    #                                          moveUpEvent, moveDownEvent, moveForwardEvent, moveBackwardEvent,
-    #                                          decodeQrEvent, failedEvent)
-    #flyingThread = threading.Thread(target=controller.flyAutomatic, daemon=True)
-    #flyingThread.start()
-#
-    #processor = videoProcessing.videoProcessor(angleOkEvent, distanceOkEvent, verticalOkEvent, horizontalOkEvent,
-    #                                          turnClockwiseEvent, turnCounterClockwiseEvent, moveLeftEvent, moveRightEvent,
-    #                                          moveUpEvent, moveDownEvent, moveForwardEvent, moveBackwardEvent,
-    #                                          decodeQrEvent, failedEvent)
-    #videoProcessingThread = threading.Thread(target=processor.process, daemon=True)
-    #videoProcessingThread.start()
-#
-    #flyingThread.join()
-    #videoProcessingThread.join()
-    #cv_img = cv2.imread("pic8.jpg")
-    #window = Tk()
-    #window.title("Placeholder Title")
-
-    #tk_img = cv2_to_tkinter(cv_img)
-
-    #label = Label(window, image=tk_img)
-    #label.pack()
-
-    #window.mainloop()
     ControlGUI()
 
