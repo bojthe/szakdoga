@@ -156,7 +156,7 @@ class ControlGUI:
         tktooltip.ToolTip(self.ascendButton, msg="Sends an Ascend command to the drone.", delay=2.0)
         tktooltip.ToolTip(self.descendButton, msg="Sends a Descend command to the drone.", delay=2.0)
 
-        # Dialog for choice between Automatic and Manual drone control
+        ### Dialog for choice between Automatic and Manual drone control
         self.isAutomatic = None
         self.dialog = tkinter.Toplevel(self.window)
         self.dialog.title("Chose a startup option!")
@@ -170,10 +170,10 @@ class ControlGUI:
         manualButton.pack(side=tkinter.RIGHT, padx=10, pady=10)
 
 
-        # Starting video feed update
+        ### Starting video feed update
         self.__updateImage(videoQueue, stopVideoEvent)
 
-        # Handling close event
+        ### Handling close event
         self.window.protocol("WM_DELETE_WINDOW", self.__onClose)
 
         ### Starting the GUI loop
