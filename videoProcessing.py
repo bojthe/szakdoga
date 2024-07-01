@@ -115,11 +115,11 @@ class videoProcessor:
 
     def __controlAngle(self, points, distance):
         # if left side is smaller than right side ---> turn clockwise
-        if points[3][1]-points[0][1]-points[2][1]-points[1][1] < 0-self.MARGINS[distance]:
+        if points[3][1]-points[0][1]-(points[2][1]-points[1][1]) < 0-self.MARGINS[distance]:
             self.turnCounterClockwiseEvent.clear()
             self.turnClockwiseEvent.set()
         # if right side smaller than left side ---> turn counter clockwise
-        elif points[3][1]-points[0][1]-points[2][1]-points[1][1] > self.MARGINS[distance]:
+        elif points[3][1]-points[0][1]-(points[2][1]-points[1][1]) > self.MARGINS[distance]:
             self.turnClockwiseEvent.clear()
             self.turnCounterClockwiseEvent.set()
         # if both sides within margin of error ---> angle is correct
